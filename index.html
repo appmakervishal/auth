@@ -54,10 +54,10 @@
       }, 100);
 
       try {
-        const response = await fetch('https://ip-api.com/json'); // HTTPS
+        const response = await fetch('https://api.ipify.org?format=json'); // CORS-friendly
         const data = await response.json();
         setTimeout(() => {
-          ipDisplay.textContent = data.query; // show real IP
+          ipDisplay.textContent = data.ip; // show real IP
         }, 3100);
       } catch (error) {
         setTimeout(() => {
@@ -80,7 +80,7 @@
 
     document.getElementById('refreshBtn').addEventListener('click', fetchIP);
 
-    // Load on start
+    // Fetch IP on page load
     fetchIP();
   </script>
 
