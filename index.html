@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>auth code genarator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
+    }
+    .blink {
+      animation: blink 0.3s infinite;
+    }
+    .monospace {
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white bg-opacity-80 backdrop-blur-md p-10 rounded-2xl shadow-2xl text-center max-w-md w-full">
+    <h1 class="text-3xl font-extrabold mb-6 text-purple-700">Your code</h1>
+    <p class="text-gray-800 text-xl mb-6 blink monospace" id="ipDisplay">Fetching...</p>
+    <div class="flex justify-center gap-4">
+      <button id="refreshBtn" class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-all duration-300 shadow-md">
+        Refresh
+      </button>
+      <button id="copyBtn" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-300 shadow-md">
+        Copy
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function getRandomIP() {
+      return `${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
+    }
+
+    async function fetchIP() {
+      const ipDisplay = document.getElementById('ipDisplay');
+      ipDisplay.textContent = 'Generating...';
+
+      // Long random cycle (3 seconds)
+      let count = 0;
+      const interval = setInterval(() => {
+        ipDisplay.textContent = getRandomIP();
+        count++;
+        if(count > 30){ // 30 * 100ms = 3 seconds
+          clearInterval(interval);
+        }
+      }, 100);
+
+      try {
+        const response = await fetch('http://ip-api.com/json');
+        const data = await response.json();
+        setTimeout(() => {
+          ipDisplay.textContent = data.query; // show real IP
+        }, 3100);
+      } catch (error) {
+        setTimeout(() => {
+          ipDisplay.textContent = 'Unable to fetch IP';
+        }, 3100);
+      }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', fetchIP);
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const text = document.getElementById('ipDisplay').textContent;
+      navigator.clipboard.writeText(text)
+        .then(() => alert('Copied to clipboard!'))
+        .catch(() => alert('Failed to copy'));
+    });
+
+    fetchIP(); // fetch on load
+  </script>
+
+</body>
+</html>
